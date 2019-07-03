@@ -45,14 +45,16 @@ master3 <- master2 %>% select(occ.name, entry.degree, Experience, cip.name, scho
 ui <- fluidPage(
 
     # Application title
-    titlePanel("Degree-to-Profession Mapping Tool"),
+    titlePanel("Occupation to Degree Mapping Tool"),
 
     # Select degrees or occupations
     sidebarLayout(
         sidebarPanel(
-            selectInput("occ_input", 
-                        "Select Degree",
-                        choices = levels(as.factor(master3$occ.name))
+            selectInput("soc_cat_input", 
+                        "Select Occupation Category",
+                        choices = levels(as.factor(master3$SOC_Cat_Name))
+            ),
+            selectInput(uiOutput("cip_select")
             )
         ),
 
@@ -65,12 +67,25 @@ ui <- fluidPage(
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
+    
+    # model.data0 <- reactive ({
+    #     data.frame( "COURSE" = sample(LETTERS[1:3], n, replace=TRUE),
+    #                 "VALUE"  = sample(1:10, n, replace=TRUE)) 
+    # })
+    # 
+    
+    # Render selectInput 
+    output$cip_input <- renderUI({
+        cip.names <- as.vector( master3 %>% select (SOC_Cat_Name, cip.name) %>% filter(cip.name == "input$cip_input"))  #unique(model.data0()$COURSE) )
+        selectInput("cip_input","Select Interesting Degrees", choices=cip.names, multiple=TRUE)    
+    })
 
     output$table <- renderDT({
         DT::datatable(
+            req("cip_input"),
             master3 %>% 
-                filter(occ.name %in% input$occ_input) %>% 
-                group_by (SOC_Cat_Name),
+                filter(SOC_Cat_Name %in% input$soc_cat_input) %>% 
+                group_by (occ.name, cip.cat),
             options = list(pageLength = 50)
         )
     })
