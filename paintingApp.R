@@ -1,4 +1,6 @@
 # 2019 07 03
+# code altered from https://www.davidsolito.com/post/conditional-drop-down-in-shiny/
+
 
 library(shiny)
 library(dplyr)
@@ -33,7 +35,7 @@ master2 <- master1 %>% left_join(soc_code, by="soc.cat")
 
 master3 <- master2 %>% select(occ.name, entry.degree, Experience, cip.name, school.id, degree.name, cip.cat, soc.cat,X25p,X50p,X90p, SOC_Cat_Name)
 
-
+tib <- master3
 
 
 shinyApp(
@@ -57,17 +59,17 @@ shinyApp(
     tab <- reactive({ 
       
       tib %>% 
-        filter(var_one == input$var1) %>% 
-        filter(var_two == input$var2) %>% 
-        filter(var_three == input$var3) %>% 
-        filter(var_four == input$var4) %>% 
-        filter(var_five == input$var5)
+        filter(SOC_Cat_Name == input$var1) %>% 
+        filter(cip.name == input$var2) %>% 
+        filter(Experience == input$var3) %>% 
+        filter(degree.name == input$var4) %>% 
+        filter(X50p == input$var5)
       
     })
     
     output$select_var1 <- renderUI({
       
-      selectizeInput('var1', 'Select variable 1', choices = c("select" = "", levels(tib$var_one)))
+      selectizeInput('var1', 'Select variable 1', choices = c("select" = "", levels(tib$SOC_Cat_Name)))
       
     })
     
@@ -76,8 +78,8 @@ shinyApp(
       
       choice_var2 <- reactive({
         tib %>% 
-          filter(var_one == input$var1) %>% 
-          pull(var_two) %>% 
+          filter(SOC_Cat_Name == input$var1) %>%  # "Business and Financial Operations Occupations"
+          pull(cip.name) %>% 
           as.character()
         
       })
@@ -90,9 +92,9 @@ shinyApp(
       
       choice_var3 <- reactive({
         tib %>% 
-          filter(var_one == input$var1) %>% 
-          filter(var_two == input$var2) %>% 
-          pull(var_three) %>% 
+          filter(SOC_Cat_Name == input$var1) %>% 
+          filter(cip.name == input$var2) %>% 
+          pull(Experience) %>% 
           as.character()
         
       })
@@ -105,10 +107,10 @@ shinyApp(
       
       choice_var4 <- reactive({
         tib %>% 
-          filter(var_one == input$var1) %>% 
-          filter(var_two == input$var2) %>% 
-          filter(var_three == input$var3) %>% 
-          pull(var_four) %>% 
+          filter(SOC_Cat_Name == input$var1) %>% 
+          filter(cip.name == input$var2) %>% 
+          filter(Experience == input$var3) %>% 
+          pull(degree.name) %>% 
           as.character()
         
       })
@@ -121,11 +123,11 @@ shinyApp(
       
       choice_var5 <- reactive({
         tib %>% 
-          filter(var_one == input$var1) %>% 
-          filter(var_two == input$var2) %>% 
-          filter(var_three == input$var3) %>% 
-          filter(var_four == input$var4) %>% 
-          pull(var_five) %>% 
+          filter(SOC_Cat_Name == input$var1) %>% 
+          filter(cip.name == input$var2) %>% 
+          filter(Experience == input$var3) %>% 
+          filter(degree.name == input$var4) %>% 
+          pull(X50p) %>% 
           as.character()
         
       })  
